@@ -1,0 +1,176 @@
+# DynRegionPerf Configuration
+# Dynamic region performance optimization plugin for Paper/Folia servers
+# 
+# This plugin dynamically manages chunks and regions based on player density
+# to maintain stable TPS/MSPT. It uses advanced clustering algorithms,
+# adaptive control systems, and regional entity management.
+
+# =============================================================================
+# DENSITY MAPPING CONFIGURATION
+# =============================================================================
+
+# Grid size for density mapping (in blocks)
+# - Larger values = less granular but better performance
+# - Smaller values = more precise but higher CPU usage
+# - Recommended: 32-128 (64 is optimal for most servers)
+gridSize: 64
+
+# Minimum number of players in a grid cell to consider it "hot"
+# - Cells with this many or more players become "hot regions"
+# - Lower values = more sensitive to player clustering
+# - Higher values = only very dense areas become hot
+# - Recommended: 2-5 (3 is optimal for most servers)
+hotThresholdPlayers: 3
+
+# Interval between density scans (in ticks, 20 ticks = 1 second)
+# - How often the plugin scans for player density changes
+# - Lower values = more responsive but higher CPU usage and FPS impact
+# - Higher values = less responsive but better performance and FPS
+# - Recommended: 40-120 (80 ticks = 4 seconds is optimal for FPS)
+scanIntervalTicks: 80
+
+# =============================================================================
+# PERFORMANCE TARGETS
+# =============================================================================
+
+# Target MSPT (Milliseconds Per Tick) - lower is better
+# - The plugin tries to keep MSPT below this value
+# - Typical range: 30-60ms (45ms is optimal for most servers)
+# - Set higher if your server can handle more load
+targetMspt: 45.0
+
+# Minimum TPS (Ticks Per Second) - higher is better
+# - The plugin tries to keep TPS above this value
+# - Typical range: 18-20 TPS (19.5 is optimal for most servers)
+# - Set lower if you want to allow more performance degradation
+minTps: 19.5
+
+# =============================================================================
+# CHUNK BUDGET CONFIGURATION
+# =============================================================================
+
+# Chunk loading budget per hot region per second
+# - How many chunks can be loaded per hot region per second
+# - Higher values = faster chunk loading but more memory usage and FPS impact
+# - Lower values = slower chunk loading but less memory usage and better FPS
+# - Recommended: 6-24 (12 is optimal for FPS performance)
+chunkBudgetPerHotRegionPerSec: 12
+
+# =============================================================================
+# RANDOM TICK SCALING
+# =============================================================================
+
+# Random tick scaling based on region temperature
+# - Hot regions get full random tick rate
+# - Cold regions get reduced random tick rate
+# - This helps reduce performance impact in unused areas
+randomTickScale:
+  hot: 1.0    # Full random tick rate for hot regions
+  cold: 0.5   # Half random tick rate for cold regions
+
+# =============================================================================
+# ENTITY CONTROLS
+# =============================================================================
+
+# Entity caps for cold regions (percentage of normal limits)
+# - Reduces entity counts in cold regions to improve performance
+# - Values are percentages (60 = 60% of normal limit)
+# - Set to 100 to disable entity limiting
+entityCaps:
+  cold:
+    mobs: 60        # Hostile mobs (zombies, skeletons, etc.)
+    animals: 60     # Passive animals (cows, pigs, etc.)
+    projectiles: 50 # Arrows, snowballs, etc.
+
+# =============================================================================
+# VIEW DISTANCE CONFIGURATION
+# =============================================================================
+
+# Per-player view distance ranges based on region temperature
+# - Hot regions: Lower view distance to reduce load
+# - Normal regions: Standard view distance
+# - Cold regions: Higher view distance for better experience
+# - Values are in chunks (1 chunk = 16 blocks)
+perPlayerViewDistance:
+  hot: 
+    min: 6    # Minimum view distance in hot regions
+    max: 8    # Maximum view distance in hot regions
+  normal:
+    min: 8    # Minimum view distance in normal regions
+    max: 10   # Maximum view distance in normal regions
+  cold:
+    min: 10   # Minimum view distance in cold regions
+    max: 12   # Maximum view distance in cold regions
+
+# =============================================================================
+# FOLIA INTEGRATION
+# =============================================================================
+
+# Folia support configuration
+# - auto: Automatically detect Folia and enable if available
+# - true: Force enable Folia features (may cause errors if not available)
+# - false: Disable Folia features even if available
+folia:
+  enabled: auto
+
+# =============================================================================
+# DEBUG CONFIGURATION
+# =============================================================================
+
+# Debug settings
+# - Enable debug mode for detailed logging
+# - Only enable for troubleshooting or development
+debug:
+  enabled: false        # Enable debug logging
+  verboseLogging: false # Enable verbose debug logging (very chatty)
+
+# =============================================================================
+# FPS OPTIMIZATION SETTINGS
+# =============================================================================
+
+# FPS-focused configuration recommendations:
+# - chunkBudgetPerHotRegionPerSec: 6-12 (lower = better FPS)
+# - scanIntervalTicks: 80-120 (higher = better FPS)
+# - gridSize: 64-128 (higher = better FPS)
+# - hotThresholdPlayers: 3-5 (higher = less frequent changes)
+
+# =============================================================================
+# PERFORMANCE TUNING GUIDE
+# =============================================================================
+#
+# For HIGH PERFORMANCE servers (8+ GB RAM, powerful CPU):
+# - gridSize: 128
+# - hotThresholdPlayers: 2
+# - chunkBudgetPerHotRegionPerSec: 48
+# - targetMspt: 30.0
+#
+# For MEDIUM PERFORMANCE servers (4-8 GB RAM, moderate CPU):
+# - gridSize: 64 (default)
+# - hotThresholdPlayers: 3 (default)
+# - chunkBudgetPerHotRegionPerSec: 24 (default)
+# - targetMspt: 45.0 (default)
+#
+# For LOW PERFORMANCE servers (2-4 GB RAM, weak CPU):
+# - gridSize: 32
+# - hotThresholdPlayers: 4
+# - chunkBudgetPerHotRegionPerSec: 12
+# - targetMspt: 60.0
+#
+# For SERVERS WITH MANY PLAYERS (50+ online):
+# - gridSize: 128
+# - hotThresholdPlayers: 5
+# - chunkBudgetPerHotRegionPerSec: 36
+# - targetMspt: 50.0
+#
+# For SERVERS WITH FEW PLAYERS (10- online):
+# - gridSize: 32
+# - hotThresholdPlayers: 2
+# - chunkBudgetPerHotRegionPerSec: 18
+# - targetMspt: 40.0
+#
+# For FPS-FOCUSED SERVERS (prioritize player FPS over responsiveness):
+# - gridSize: 128
+# - hotThresholdPlayers: 5
+# - chunkBudgetPerHotRegionPerSec: 6
+# - scanIntervalTicks: 120
+# - targetMspt: 40.0
